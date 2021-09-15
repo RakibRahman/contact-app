@@ -1,23 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import fireDB from "./firebase";
+import Input from "./Input";
+import People from "./People";
+import { useState, useEffect } from "react";
 
 function App() {
+  const dbRef = fireDB.database();
+
+  const initialState = {
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  };
+  const [contactForm, setContactForm] = useState(initialState);
+  const [records, setRecords] = useState([]);
+
+  const sendData = () => {
+    dbRef
+      .ref("contacts")
+      .push(contactForm, (err) =>
+        err ? console.log(err) : console.table("Success")
+      );
+  };
+  useEffect(() => {
+    dbRef.ref("contacts").on(
+      "value",
+      (snapshot) => {
+        let temp = [];
+        snapshot.forEach((data) => {
+          temp.push(data.val());
+        });
+        setRecords(temp);
+      },
+      (errorObject) => {
+        console.log("The read failed: " + errorObject.name);
+      }
+    );
+  }, []);
+  const onChangeHandle = (e) => {
+    setContactForm({
+      ...contactForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (!contactForm.firstName || !contactForm.phone) return;
+
+    sendData();
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Contact App</h1>
+      <Input
+        onChange={onChangeHandle}
+        onSubmit={submitHandler}
+        contactForm={contactForm}
+      />
+      <People records={records} />
     </div>
   );
 }
