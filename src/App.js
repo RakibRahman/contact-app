@@ -49,10 +49,11 @@ function App() {
     if (!contactForm.firstName || !contactForm.phone) return;
 
     sendData();
+    setContactForm(initialState);
   };
   return (
     <div className="App">
-      <h1>Contact App</h1>
+      <h1 style={{ textAlign: "center", margin: "1rem 0" }}>Contact App</h1>
       <Input
         onChange={onChangeHandle}
         onSubmit={submitHandler}
