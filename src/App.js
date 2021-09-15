@@ -1,4 +1,3 @@
-import "./App.css";
 import fireDB from "./firebase";
 import Input from "./Input";
 import People from "./People";
