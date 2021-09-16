@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import fireDB from "./firebase";
 import Input from "./Input";
 import People from "./People";
@@ -14,22 +15,42 @@ function App() {
   };
   const [contactForm, setContactForm] = useState(initialState);
   const [records, setRecords] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const sendData = () => {
-    dbRef
-      .ref("contacts")
-      .push(contactForm, (err) =>
-        err ? console.log(err) : console.table("Success")
-      );
+    //update data if there is a 'currentUser' state /tri ggered by edit btn
+    if (currentUser) {
+      dbRef
+        .ref(`contacts/${currentUser.id}`)
+        .set(contactForm, (err) =>
+          err
+            ? console.log("something went wrong")
+            : console.log("user updated successfully")
+        );
+    } else {
+      dbRef
+        .ref("contacts")
+        .push(contactForm, (err) =>
+          err ? console.log(err) : console.table("data send")
+        );
+    }
+    console.log(contactForm);
+    setContactForm(initialState);
   };
+  const deleteData = (id) => {
+    const ref = dbRef.ref("contacts").child(id); // passing the id from records state/user
+    ref.remove();
+  };
+
   useEffect(() => {
     dbRef.ref("contacts").on(
       "value",
       (snapshot) => {
         let temp = [];
-        snapshot.forEach((data) => {
-          temp.push(data.val());
-        });
+        const list = snapshot.val();
+        for (let id in list) {
+          temp.push({ id, ...list[id] });
+        }
         setRecords(temp);
       },
       (errorObject) => {
@@ -37,6 +58,7 @@ function App() {
       }
     );
   }, []);
+
   const onChangeHandle = (e) => {
     setContactForm({
       ...contactForm,
@@ -46,8 +68,6 @@ function App() {
   const submitHandler = (e) => {
     e.preventDefault();
     if (!contactForm.firstName || !contactForm.phone) return;
-
-    sendData();
     setContactForm(initialState);
   };
   return (
@@ -57,8 +77,16 @@ function App() {
         onChange={onChangeHandle}
         onSubmit={submitHandler}
         contactForm={contactForm}
+        sendData={sendData}
       />
-      <People records={records} />
+      <People
+        records={records}
+        setContactForm={setContactForm}
+        contactForm={contactForm}
+        setCurrentUser={setCurrentUser}
+        currentUser={currentUser}
+        deleteData={deleteData}
+      />
     </div>
   );
 }

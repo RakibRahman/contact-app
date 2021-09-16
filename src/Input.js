@@ -46,7 +46,7 @@ const Div = styled.div`
   gap: 0.2rem;
 `;
 
-function Input({ contactForm, onSubmit, onChange }) {
+function Input({ contactForm, onSubmit, onChange, sendData }) {
   const id = useRef(uniqid());
   const inputRef = useRef();
   useEffect(() => {
@@ -99,7 +99,7 @@ function Input({ contactForm, onSubmit, onChange }) {
           placeholder="Enter Email Address"
         />
       </Div>
-      <Button type="submit" primary>
+      <Button type="button" primary onClick={sendData}>
         Save
       </Button>
     </Form>

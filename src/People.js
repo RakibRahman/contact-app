@@ -1,6 +1,9 @@
-import React, { Fragment, useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { Fragment } from "react";
 import uniqid from "uniqid";
 import styled from "styled-components";
+import { FiEdit, FiXSquare } from "react-icons/fi";
+import { useEffect } from "react";
 
 const Table = styled.table`
   border-spacing: 1;
@@ -26,7 +29,29 @@ const Title = styled.h1`
   text-align: center;
   margin: 1rem 0;
 `;
-function People({ records }) {
+const Button = styled.button`
+  background: none;
+  padding: 0.2rem;
+  color: ${(props) => (props.del ? "red" : "seagreen")};
+  border: none;
+  outline: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+`;
+function People({
+  records,
+  currentUser,
+  deleteData,
+  setCurrentUser,
+  setContactForm,
+}) {
+  useEffect(() => {
+    console.log(currentUser);
+    if (currentUser) {
+      setContactForm(currentUser);
+    }
+    console.log("current user added");
+  }, [currentUser]);
   return (
     <Fragment>
       <Title>Contact List</Title>
@@ -48,6 +73,14 @@ function People({ records }) {
               <td> {user.lastName}</td>
               <td> {user.phone}</td>
               <td> {user.email}</td>
+              <td>
+                <Button onClick={() => setCurrentUser(user)}>
+                  <FiEdit />
+                </Button>
+                <Button del onClick={() => deleteData(user.id)}>
+                  <FiXSquare />
+                </Button>
+              </td>
             </TbodyTr>
           ))}
         </tbody>
