@@ -43,6 +43,7 @@ function App() {
   };
 
   useEffect(() => {
+    document.title = "Contact App";
     dbRef.ref("contacts").on(
       "value",
       (snapshot) => {
